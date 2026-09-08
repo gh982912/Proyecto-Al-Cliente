@@ -1,0 +1,567 @@
+DROP DATABASE IF EXISTS control_produccion_textil;
+CREATE DATABASE control_produccion_textil
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
+USE control_produccion_textil;
+
+CREATE TABLE roles (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(30) NOT NULL UNIQUE,
+    descripcion VARCHAR(150)
+) ENGINE=InnoDB;
+
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    nombre_completo VARCHAR(120) NOT NULL,
+    email VARCHAR(120) UNIQUE,
+    id_rol INT NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuario_rol FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
+) ENGINE=InnoDB;
+
+CREATE TABLE departamentos (
+    id_departamento INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    ancho_m DECIMAL(5,2) NOT NULL,
+    largo_m DECIMAL(5,2) NOT NULL,
+    alto_m DECIMAL(4,2) NOT NULL DEFAULT 2.80,
+    pcs INT NOT NULL DEFAULT 0,
+    telefonos_ip INT NOT NULL DEFAULT 0,
+    impresoras_red INT NOT NULL DEFAULT 0,
+    plotters INT NOT NULL DEFAULT 0,
+    impresoras_3d INT NOT NULL DEFAULT 0,
+    camaras_ip INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
+
+CREATE TABLE empleados (
+    id_empleado INT AUTO_INCREMENT PRIMARY KEY,
+    legajo VARCHAR(20) NOT NULL UNIQUE,
+    nombre VARCHAR(60) NOT NULL,
+    apellido VARCHAR(60) NOT NULL,
+    dni VARCHAR(20) UNIQUE,
+    cargo VARCHAR(80) NOT NULL,
+    email VARCHAR(120),
+    telefono VARCHAR(30),
+    id_departamento INT NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT fk_empleado_departamento
+        FOREIGN KEY (id_departamento) REFERENCES departamentos(id_departamento)
+) ENGINE=InnoDB;
+
+CREATE TABLE clientes (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    razon_social VARCHAR(120) NOT NULL,
+    cuit VARCHAR(20) UNIQUE,
+    contacto VARCHAR(100),
+    email VARCHAR(120),
+    telefono VARCHAR(30),
+    direccion VARCHAR(180),
+    activo BOOLEAN NOT NULL DEFAULT TRUE
+) ENGINE=InnoDB;
+
+CREATE TABLE proveedores (
+    id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
+    razon_social VARCHAR(120) NOT NULL,
+    cuit VARCHAR(20) UNIQUE,
+    contacto VARCHAR(100),
+    email VARCHAR(120),
+    telefono VARCHAR(30),
+    direccion VARCHAR(180),
+    activo BOOLEAN NOT NULL DEFAULT TRUE
+) ENGINE=InnoDB;
+
+CREATE TABLE materias_primas (
+    id_materia_prima INT AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(30) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL,
+    unidad_medida ENUM('kg','m','unidad','litro') NOT NULL,
+    stock_actual DECIMAL(12,3) NOT NULL DEFAULT 0,
+    stock_minimo DECIMAL(12,3) NOT NULL DEFAULT 0,
+    costo_unitario DECIMAL(12,2) NOT NULL DEFAULT 0,
+    id_proveedor INT,
+    CONSTRAINT fk_mp_proveedor FOREIGN KEY (id_proveedor)
+        REFERENCES proveedores(id_proveedor)
+) ENGINE=InnoDB;
+
+CREATE TABLE categorias_producto (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(80) NOT NULL UNIQUE,
+    descripcion VARCHAR(180)
+) ENGINE=InnoDB;
+
+CREATE TABLE productos (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(30) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(255),
+    unidad_medida ENUM('unidad','m','kg') NOT NULL,
+    precio_unitario DECIMAL(12,2) NOT NULL,
+    stock_actual DECIMAL(12,3) NOT NULL DEFAULT 0,
+    stock_minimo DECIMAL(12,3) NOT NULL DEFAULT 0,
+    id_categoria INT NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT fk_producto_categoria FOREIGN KEY (id_categoria)
+        REFERENCES categorias_producto(id_categoria)
+) ENGINE=InnoDB;
+
+CREATE TABLE etapas_produccion (
+    id_etapa INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(80) NOT NULL UNIQUE,
+    descripcion VARCHAR(180),
+    orden_etapa INT NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE ordenes_produccion (
+    id_orden INT AUTO_INCREMENT PRIMARY KEY,
+    numero_orden VARCHAR(30) NOT NULL UNIQUE,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin_estimada DATE,
+    fecha_fin_real DATE,
+    estado ENUM('planificada','en_proceso','pausada','finalizada','cancelada')
+        NOT NULL DEFAULT 'planificada',
+    cantidad_planificada DECIMAL(12,3) NOT NULL,
+    cantidad_producida DECIMAL(12,3) NOT NULL DEFAULT 0,
+    observaciones VARCHAR(255),
+    id_producto INT NOT NULL,
+    id_empleado_responsable INT NOT NULL,
+    CONSTRAINT fk_orden_producto FOREIGN KEY (id_producto)
+        REFERENCES productos(id_producto),
+    CONSTRAINT fk_orden_responsable FOREIGN KEY (id_empleado_responsable)
+        REFERENCES empleados(id_empleado)
+) ENGINE=InnoDB;
+
+CREATE TABLE orden_etapa (
+    id_orden_etapa INT AUTO_INCREMENT PRIMARY KEY,
+    id_orden INT NOT NULL,
+    id_etapa INT NOT NULL,
+    fecha_inicio DATETIME,
+    fecha_fin DATETIME,
+    estado ENUM('pendiente','en_proceso','finalizada','bloqueada')
+        NOT NULL DEFAULT 'pendiente',
+    cantidad_producida DECIMAL(12,3) NOT NULL DEFAULT 0,
+    observaciones VARCHAR(255),
+    CONSTRAINT uq_orden_etapa UNIQUE (id_orden, id_etapa),
+    CONSTRAINT fk_oe_orden FOREIGN KEY (id_orden) REFERENCES ordenes_produccion(id_orden),
+    CONSTRAINT fk_oe_etapa FOREIGN KEY (id_etapa) REFERENCES etapas_produccion(id_etapa)
+) ENGINE=InnoDB;
+
+CREATE TABLE consumo_materia_prima (
+    id_consumo INT AUTO_INCREMENT PRIMARY KEY,
+    id_orden INT NOT NULL,
+    id_materia_prima INT NOT NULL,
+    cantidad DECIMAL(12,3) NOT NULL,
+    fecha_consumo DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_consumo_orden FOREIGN KEY (id_orden) REFERENCES ordenes_produccion(id_orden),
+    CONSTRAINT fk_consumo_mp FOREIGN KEY (id_materia_prima) REFERENCES materias_primas(id_materia_prima)
+) ENGINE=InnoDB;
+
+CREATE TABLE almacenes (
+    id_almacen INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    tipo ENUM('materia_prima','producto_terminado','mixto') NOT NULL,
+    ubicacion VARCHAR(150)
+) ENGINE=InnoDB;
+
+CREATE TABLE movimientos_inventario (
+    id_movimiento BIGINT AUTO_INCREMENT PRIMARY KEY,
+    tipo_movimiento ENUM('entrada','salida','ajuste') NOT NULL,
+    cantidad DECIMAL(12,3) NOT NULL,
+    fecha_movimiento DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    referencia VARCHAR(80),
+    id_materia_prima INT,
+    id_producto INT,
+    id_almacen INT NOT NULL,
+    id_usuario INT NOT NULL,
+    CHECK ((id_materia_prima IS NOT NULL AND id_producto IS NULL)
+        OR (id_materia_prima IS NULL AND id_producto IS NOT NULL)),
+    CONSTRAINT fk_mov_mp FOREIGN KEY (id_materia_prima) REFERENCES materias_primas(id_materia_prima),
+    CONSTRAINT fk_mov_producto FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
+    CONSTRAINT fk_mov_almacen FOREIGN KEY (id_almacen) REFERENCES almacenes(id_almacen),
+    CONSTRAINT fk_mov_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+) ENGINE=InnoDB;
+
+CREATE TABLE ventas (
+    id_venta INT AUTO_INCREMENT PRIMARY KEY,
+    numero_venta VARCHAR(30) NOT NULL UNIQUE,
+    fecha_venta DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    estado ENUM('pendiente','confirmada','cancelada','entregada') NOT NULL DEFAULT 'pendiente',
+    id_cliente INT NOT NULL,
+    id_empleado INT NOT NULL,
+    CONSTRAINT fk_venta_cliente FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+    CONSTRAINT fk_venta_empleado FOREIGN KEY (id_empleado) REFERENCES empleados(id_empleado)
+) ENGINE=InnoDB;
+
+CREATE TABLE detalle_venta (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    id_venta INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad DECIMAL(12,3) NOT NULL,
+    precio_unitario DECIMAL(12,2) NOT NULL,
+    subtotal DECIMAL(14,2) GENERATED ALWAYS AS (cantidad * precio_unitario) STORED,
+    CONSTRAINT uq_detalle_venta UNIQUE (id_venta, id_producto),
+    CONSTRAINT fk_dv_venta FOREIGN KEY (id_venta) REFERENCES ventas(id_venta),
+    CONSTRAINT fk_dv_producto FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+) ENGINE=InnoDB;
+
+CREATE TABLE despachos (
+    id_despacho INT AUTO_INCREMENT PRIMARY KEY,
+    numero_despacho VARCHAR(30) NOT NULL UNIQUE,
+    fecha_despacho DATETIME,
+    direccion_entrega VARCHAR(180) NOT NULL,
+    transporte VARCHAR(100),
+    estado ENUM('preparando','despachado','en_transito','entregado','cancelado')
+        NOT NULL DEFAULT 'preparando',
+    id_venta INT NOT NULL UNIQUE,
+    CONSTRAINT fk_despacho_venta FOREIGN KEY (id_venta) REFERENCES ventas(id_venta)
+) ENGINE=InnoDB;
+
+CREATE TABLE controles_calidad (
+    id_control INT AUTO_INCREMENT PRIMARY KEY,
+    id_orden INT NOT NULL,
+    fecha_control DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    resultado ENUM('aprobado','rechazado','observado') NOT NULL,
+    porcentaje_defectos DECIMAL(5,2) NOT NULL DEFAULT 0,
+    observaciones VARCHAR(255),
+    id_empleado INT NOT NULL,
+    CONSTRAINT fk_calidad_orden FOREIGN KEY (id_orden) REFERENCES ordenes_produccion(id_orden),
+    CONSTRAINT fk_calidad_empleado FOREIGN KEY (id_empleado) REFERENCES empleados(id_empleado)
+) ENGINE=InnoDB;
+
+CREATE TABLE tipos_equipo (
+    id_tipo_equipo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE equipos_departamento (
+    id_equipo_departamento INT AUTO_INCREMENT PRIMARY KEY,
+    id_departamento INT NOT NULL,
+    id_tipo_equipo INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 0,
+    CONSTRAINT uq_equipo_depto UNIQUE (id_departamento, id_tipo_equipo),
+    CONSTRAINT fk_ed_departamento FOREIGN KEY (id_departamento) REFERENCES departamentos(id_departamento),
+    CONSTRAINT fk_ed_tipo FOREIGN KEY (id_tipo_equipo) REFERENCES tipos_equipo(id_tipo_equipo)
+) ENGINE=InnoDB;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_orden_validar
+BEFORE INSERT ON ordenes_produccion
+FOR EACH ROW
+BEGIN
+    IF NEW.cantidad_planificada <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cantidad planificada debe ser mayor a cero';
+    END IF;
+
+    IF NEW.fecha_fin_estimada IS NOT NULL
+       AND NEW.fecha_fin_estimada < NEW.fecha_inicio THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La fecha estimada no puede ser anterior al inicio';
+    END IF;
+END$$
+
+CREATE TRIGGER trg_movimiento_producto_stock
+AFTER INSERT ON movimientos_inventario
+FOR EACH ROW
+BEGIN
+    IF NEW.id_producto IS NOT NULL THEN
+        IF NEW.tipo_movimiento = 'entrada' THEN
+            UPDATE productos
+            SET stock_actual = stock_actual + NEW.cantidad
+            WHERE id_producto = NEW.id_producto;
+        ELSEIF NEW.tipo_movimiento = 'salida' THEN
+            UPDATE productos
+            SET stock_actual = stock_actual - NEW.cantidad
+            WHERE id_producto = NEW.id_producto;
+        END IF;
+    END IF;
+END$$
+
+CREATE TRIGGER trg_movimiento_mp_stock
+AFTER INSERT ON movimientos_inventario
+FOR EACH ROW
+BEGIN
+    IF NEW.id_materia_prima IS NOT NULL THEN
+        IF NEW.tipo_movimiento = 'entrada' THEN
+            UPDATE materias_primas
+            SET stock_actual = stock_actual + NEW.cantidad
+            WHERE id_materia_prima = NEW.id_materia_prima;
+        ELSEIF NEW.tipo_movimiento = 'salida' THEN
+            UPDATE materias_primas
+            SET stock_actual = stock_actual - NEW.cantidad
+            WHERE id_materia_prima = NEW.id_materia_prima;
+        END IF;
+    END IF;
+END$$
+
+CREATE TRIGGER trg_despacho_entregado
+BEFORE UPDATE ON despachos
+FOR EACH ROW
+BEGIN
+    IF NEW.estado = 'entregado' AND OLD.estado <> 'entregado' THEN
+        SET NEW.fecha_despacho = COALESCE(NEW.fecha_despacho, CURRENT_TIMESTAMP);
+    END IF;
+END$$
+
+CREATE PROCEDURE sp_crear_orden_produccion(
+    IN p_numero VARCHAR(30),
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_cantidad DECIMAL(12,3),
+    IN p_producto INT,
+    IN p_empleado INT
+)
+BEGIN
+    INSERT INTO ordenes_produccion
+        (numero_orden, fecha_inicio, fecha_fin_estimada,
+         cantidad_planificada, id_producto, id_empleado_responsable)
+    VALUES
+        (p_numero, p_fecha_inicio, p_fecha_fin,
+         p_cantidad, p_producto, p_empleado);
+END$$
+
+CREATE PROCEDURE sp_registrar_movimiento(
+    IN p_tipo VARCHAR(20),
+    IN p_cantidad DECIMAL(12,3),
+    IN p_referencia VARCHAR(80),
+    IN p_materia_prima INT,
+    IN p_producto INT,
+    IN p_almacen INT,
+    IN p_usuario INT
+)
+BEGIN
+    IF p_tipo NOT IN ('entrada','salida','ajuste') THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Tipo de movimiento inválido';
+    END IF;
+
+    IF p_cantidad <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cantidad debe ser mayor a cero';
+    END IF;
+
+    IF (p_materia_prima IS NULL AND p_producto IS NULL)
+       OR (p_materia_prima IS NOT NULL AND p_producto IS NOT NULL) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Debe indicar una materia prima o un producto, pero no ambos';
+    END IF;
+
+    INSERT INTO movimientos_inventario
+        (tipo_movimiento, cantidad, referencia, id_materia_prima,
+         id_producto, id_almacen, id_usuario)
+    VALUES
+        (p_tipo, p_cantidad, p_referencia, p_materia_prima,
+         p_producto, p_almacen, p_usuario);
+END$$
+
+CREATE PROCEDURE sp_registrar_venta(
+    IN p_numero VARCHAR(30),
+    IN p_cliente INT,
+    IN p_empleado INT,
+    IN p_producto INT,
+    IN p_cantidad DECIMAL(12,3)
+)
+BEGIN
+    DECLARE v_precio DECIMAL(12,2);
+    DECLARE v_venta INT;
+
+    IF p_cantidad <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cantidad de venta debe ser mayor a cero';
+    END IF;
+
+    SELECT precio_unitario INTO v_precio
+    FROM productos
+    WHERE id_producto = p_producto AND activo = TRUE;
+
+    IF v_precio IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El producto no existe o está inactivo';
+    END IF;
+
+    INSERT INTO ventas(numero_venta, id_cliente, id_empleado, estado)
+    VALUES(p_numero, p_cliente, p_empleado, 'confirmada');
+
+    SET v_venta = LAST_INSERT_ID();
+
+    INSERT INTO detalle_venta(id_venta, id_producto, cantidad, precio_unitario)
+    VALUES(v_venta, p_producto, p_cantidad, v_precio);
+END$$
+
+CREATE PROCEDURE sp_registrar_consumo_mp(
+    IN p_orden INT,
+    IN p_materia_prima INT,
+    IN p_cantidad DECIMAL(12,3)
+)
+BEGIN
+    DECLARE v_stock DECIMAL(12,3);
+
+    SELECT stock_actual INTO v_stock
+    FROM materias_primas
+    WHERE id_materia_prima = p_materia_prima;
+
+    IF v_stock IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La materia prima no existe';
+    END IF;
+
+    IF p_cantidad <= 0 OR v_stock < p_cantidad THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Stock de materia prima insuficiente o cantidad inválida';
+    END IF;
+
+    INSERT INTO consumo_materia_prima(id_orden, id_materia_prima, cantidad)
+    VALUES(p_orden, p_materia_prima, p_cantidad);
+
+    UPDATE materias_primas
+    SET stock_actual = stock_actual - p_cantidad
+    WHERE id_materia_prima = p_materia_prima;
+END$$
+
+CREATE PROCEDURE sp_resumen_produccion(IN p_orden INT)
+BEGIN
+    SELECT
+        o.numero_orden,
+        p.codigo AS codigo_producto,
+        p.nombre AS producto,
+        o.estado,
+        o.cantidad_planificada,
+        o.cantidad_producida,
+        COALESCE(SUM(c.cantidad), 0) AS materia_prima_consumida,
+        o.fecha_inicio,
+        o.fecha_fin_estimada,
+        o.fecha_fin_real
+    FROM ordenes_produccion o
+    INNER JOIN productos p ON p.id_producto = o.id_producto
+    LEFT JOIN consumo_materia_prima c ON c.id_orden = o.id_orden
+    WHERE o.id_orden = p_orden
+    GROUP BY o.id_orden, o.numero_orden, p.codigo, p.nombre, o.estado,
+             o.cantidad_planificada, o.cantidad_producida,
+             o.fecha_inicio, o.fecha_fin_estimada, o.fecha_fin_real;
+END$$
+
+DELIMITER ;
+
+
+INSERT INTO roles(nombre, descripcion) VALUES
+('admin','Acceso total al sistema'),
+('empleado','Gestión operativa de producción y logística'),
+('cliente','Consulta de pedidos y entregas');
+
+INSERT INTO usuarios(nombre_usuario,password_hash,nombre_completo,email,id_rol) VALUES
+('admin','CAMBIAR_HASH','Administrador del sistema','admin@empresa.local',1),
+('empleado01','CAMBIAR_HASH','Empleado de producción','empleado@empresa.local',2),
+('cliente01','CAMBIAR_HASH','Cliente de prueba','cliente@empresa.local',3);
+
+INSERT INTO departamentos
+(nombre,ancho_m,largo_m,alto_m,pcs,telefonos_ip,impresoras_red,plotters,impresoras_3d,camaras_ip)
+VALUES
+('Gerencia de Producción',20.3,21.3,2.8,85,85,2,0,4,3),
+('Hilandería',22.4,11.0,2.8,25,25,1,0,4,3),
+('Tejeduría',4.0,18.4,2.8,18,18,2,0,2,3),
+('Tintorería y Acabados',18.7,26.8,2.8,12,12,3,0,0,3),
+('Diseño Textil',24.6,20.5,2.8,35,35,1,0,2,3),
+('Control de Calidad',26.3,29.0,2.8,76,76,1,0,3,3),
+('Mantenimiento Industrial',7.4,21.1,2.8,78,78,1,0,1,3),
+('Almacén de Materia Prima',8.5,11.8,2.8,76,76,1,0,2,3),
+('Depósito de Productos Terminados',15.2,15.1,2.8,86,86,2,0,4,3),
+('Logística y Despacho',6.3,27.1,2.8,28,28,2,0,3,3),
+('Ventas Mayoristas',23.1,28.1,2.8,105,105,1,0,3,3),
+('Comercio Exterior',16.7,20.1,2.8,101,101,2,0,3,3),
+('Compras y Suministros',25.5,16.9,2.8,40,40,1,0,3,3),
+('Recursos Humanos',25.3,3.8,2.8,33,33,3,0,2,3),
+('Administración y Contabilidad',22.0,15.2,2.8,103,103,1,0,3,3),
+('Seguridad e Higiene',5.0,15.7,2.8,50,50,1,0,0,3),
+('Sistemas e IT',16.3,12.9,2.8,61,61,1,0,1,3),
+('Investigación y Desarrollo (I+D)',11.5,25.4,2.8,111,111,1,0,1,3),
+('Atención al Cliente',16.6,15.1,2.8,53,53,1,2,0,3),
+('Gestión Ambiental',26.3,23.1,2.8,24,24,1,0,1,3);
+
+INSERT INTO empleados(legajo,nombre,apellido,dni,cargo,email,id_departamento) VALUES
+('EMP001','Carlos','Gómez','30111222','Jefe de Producción','carlos.gomez@empresa.local',1),
+('EMP002','Lucía','Fernández','31222333','Supervisora de Hilandería','lucia.fernandez@empresa.local',2),
+('EMP003','Martín','Pérez','32333444','Analista de Calidad','martin.perez@empresa.local',6),
+('EMP004','Sofía','Rodríguez','33444555','Analista de Logística','sofia.rodriguez@empresa.local',10),
+('EMP005','Diego','López','34555666','Administrador de Sistemas','diego.lopez@empresa.local',17);
+
+INSERT INTO clientes(razon_social,cuit,contacto,email,telefono,direccion) VALUES
+('Textiles del Sur S.A.','30-71234567-1','María Silva','compras@textilesdelsur.com','11-4000-1000','Av. Industrial 1200'),
+('Moda Argentina S.R.L.','30-72345678-2','Jorge Díaz','pedidos@modaargentina.com','11-4000-2000','Calle Central 850'),
+('Distribuidora Nacional','30-73456789-3','Ana Torres','ventas@distribuidora.com','11-4000-3000','Ruta 8 Km 32');
+
+INSERT INTO proveedores(razon_social,cuit,contacto,email,telefono,direccion) VALUES
+('Algodones Argentinos S.A.','30-70123456-7','Pedro Núñez','ventas@algodones.com','11-4100-1000','Parque Industrial 100'),
+('Tintas del Plata S.R.L.','30-70123457-8','Laura Molina','ventas@tintasplata.com','11-4100-2000','Zona Industrial 200'),
+('Fibras Técnicas S.A.','30-70123458-9','Roberto Sosa','contacto@fibrastecnicas.com','11-4100-3000','Av. Textil 500');
+
+INSERT INTO categorias_producto(nombre,descripcion) VALUES
+('Tela','Productos textiles por metro'),
+('Ropa','Prendas confeccionadas'),
+('Accesorios','Productos complementarios');
+
+INSERT INTO materias_primas
+(codigo,nombre,unidad_medida,stock_actual,stock_minimo,costo_unitario,id_proveedor) VALUES
+('MP-ALG-001','Algodón peinado','kg',1200,300,4.50,1),
+('MP-HIL-002','Hilo de algodón','kg',850,200,7.20,1),
+('MP-TIN-003','Colorante textil azul','kg',250,50,12.00,2),
+('MP-FIB-004','Fibra sintética','kg',600,150,5.80,3);
+
+INSERT INTO productos
+(codigo,nombre,descripcion,unidad_medida,precio_unitario,stock_actual,stock_minimo,id_categoria) VALUES
+('PT-TEL-001','Tela de algodón','Tela de algodón para confección','m',8.50,0,100,1),
+('PT-TEL-002','Tela sintética','Tela sintética de alta resistencia','m',10.00,0,100,1),
+('PT-ROP-001','Remera básica','Remera textil terminada','unidad',15.00,0,50,2),
+('PT-ACC-001','Rollo textil','Rollo de tela para distribución','unidad',80.00,0,20,3);
+
+INSERT INTO etapas_produccion(nombre,descripcion,orden_etapa) VALUES
+('Hilado','Preparación y transformación de fibras en hilo',1),
+('Tejido','Formación de la tela',2),
+('Tintura','Aplicación de color',3),
+('Acabado','Tratamientos finales',4),
+('Control de Calidad','Inspección del producto',5),
+('Empaque','Preparación para despacho',6);
+
+INSERT INTO almacenes(nombre,tipo,ubicacion) VALUES
+('Almacén de Materia Prima','materia_prima','Sector A'),
+('Depósito de Productos Terminados','producto_terminado','Sector B'),
+('Almacén General','mixto','Sector C');
+
+INSERT INTO tipos_equipo(nombre) VALUES
+('PC'),('Teléfono IP'),('Impresora de red'),('Plotter'),('Impresora 3D'),('Cámara IP');
+
+INSERT INTO equipos_departamento(id_departamento,id_tipo_equipo,cantidad)
+SELECT id_departamento, 1, pcs FROM departamentos;
+INSERT INTO equipos_departamento(id_departamento,id_tipo_equipo,cantidad)
+SELECT id_departamento, 2, telefonos_ip FROM departamentos;
+INSERT INTO equipos_departamento(id_departamento,id_tipo_equipo,cantidad)
+SELECT id_departamento, 3, impresoras_red FROM departamentos;
+INSERT INTO equipos_departamento(id_departamento,id_tipo_equipo,cantidad)
+SELECT id_departamento, 4, plotters FROM departamentos;
+INSERT INTO equipos_departamento(id_departamento,id_tipo_equipo,cantidad)
+SELECT id_departamento, 5, impresoras_3d FROM departamentos;
+INSERT INTO equipos_departamento(id_departamento,id_tipo_equipo,cantidad)
+SELECT id_departamento, 6, camaras_ip FROM departamentos;
+
+INSERT INTO ordenes_produccion
+(numero_orden,fecha_inicio,fecha_fin_estimada,estado,cantidad_planificada,id_producto,id_empleado_responsable)
+VALUES
+('OP-2026-001','2026-09-01','2026-09-15','en_proceso',500,1,1),
+('OP-2026-002','2026-09-03','2026-09-20','planificada',300,2,2);
+
+INSERT INTO orden_etapa(id_orden,id_etapa,estado) VALUES
+(1,1,'finalizada'),(1,2,'en_proceso'),(1,3,'pendiente'),
+(1,4,'pendiente'),(1,5,'pendiente'),(1,6,'pendiente'),
+(2,1,'pendiente'),(2,2,'pendiente'),(2,3,'pendiente'),
+(2,4,'pendiente'),(2,5,'pendiente'),(2,6,'pendiente');
+
+
+ SELECT codigo, nombre, stock_actual, stock_minimo FROM productos;
+ SELECT d.nombre, t.nombre AS equipo, e.cantidad
+ FROM equipos_departamento e
+ JOIN departamentos d ON d.id_departamento=e.id_departamento
+ JOIN tipos_equipo t ON t.id_tipo_equipo=e.id_tipo_equipo
+ ORDER BY d.id_departamento, t.id_tipo_equipo;
+ SELECT o.numero_orden,p.nombre,o.estado,o.cantidad_planificada,o.cantidad_producida
+ FROM ordenes_produccion o JOIN productos p ON p.id_producto=o.id_producto;
