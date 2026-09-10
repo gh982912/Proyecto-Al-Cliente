@@ -1,1 +1,333 @@
+// HTML
 
+!DOCTYPE html>
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda textil</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- LOGIN Y REGISTRO -->
+<div class="contenedor" id="loginRegistro">
+
+    <h1 id="titulo">Inicio de Sesión</h1>
+
+    <!-- LOGIN -->
+    <form id="formLogin">
+
+        <label>Usuario</label>
+        <input type="text" placeholder="Ingrese su usuario" required>
+
+        <label>Contraseña</label>
+        <input type="password" placeholder="Ingrese su contraseña" required>
+
+        <button type="submit">Login</button>
+
+        <p>
+            ¿No tienes una cuenta?
+            <a href="#" onclick="mostrarRegistro()">Registrarse</a>
+        </p>
+
+    </form>
+
+    <!-- REGISTRO -->
+    <form id="formRegistro" style="display: none;">
+
+        <label>Usuario</label>
+        <input type="text" placeholder="Ingrese un usuario" required>
+
+        <label>Contraseña</label>
+        <input type="password" placeholder="Ingrese una contraseña" required>
+
+        <button type="submit">Registrarse</button>
+
+        <p>
+            ¿Ya tienes una cuenta?
+            <a href="#" onclick="mostrarLogin()">Iniciar Sesión</a>
+        </p>
+
+    </form>
+
+</div>
+
+
+<!-- PAGINA PRINCIPAL -->
+<div id="paginaPrincipal" style="display: none;">
+
+    <nav>
+        <h2>Mi Tienda</h2>
+
+        <button onclick="mostrarSeccion('inicio')">Inicio</button>
+        <button onclick="mostrarSeccion('categorias')">Categorías</button>
+        <button onclick="mostrarSeccion('compras')">Mis compras</button>
+        <button onclick="mostrarSeccion('ayuda')">Ayuda</button>
+        <button onclick="cerrarSesion()">Cerrar sesión</button>
+    </nav>
+
+
+    <main>
+
+        <!-- INICIO -->
+        <section id="inicio" class="seccion">
+            <h1>Inicio</h1>
+            <p>Bienvenido a nuestra tienda.</p>
+            <p>Desde aquí puedes consultar categorías, compras y facturación.</p>
+        </section>
+
+
+        <!-- CATEGORIAS -->
+        <section id="categorias" class="seccion" style="display: none;">
+            <h1>Categorías</h1>
+
+            <div class="categorias">
+                <div>Algodon</div>
+                <div>Lino</div>
+                <div>Seda</div>
+                <div>Lana</div>
+                <div>Denim</div>
+                <div>Pana</div>
+                <div>Terciopelo</div>
+                <div>Saten</div>
+                <div>Chifon</div>
+                <div>Encaje</div>
+                <div>Jersey</div>
+                <div>Poliester</div>
+                <div>Nailon</div>
+                <div>Rayon</div>
+                <div>Muselina</div>
+                <div>Popelina</div>
+                <div>Tafetan</div>
+                <div>Tweed</div>
+                <div>Lycra</div>
+                <div>Fieltro</div>
+                <div>Polar</div>
+                <div>Organza</div>
+                <div>Pique</div>
+                <div>Brin</div>
+                <div>Crepe</div>
+            </div>
+        </section>
+
+        <!-- COMPRAS -->
+        <section id="compras" class="seccion" style="display: none;">
+            <h1>Mis compras</h1>
+
+            <div class="compra">
+                <h3>Compra #001</h3>
+                <p>Producto: Ejemplo</p>
+                <p>Precio: $10.000</p>
+                <p>Estado: Entregado</p>
+            </div>
+
+            <div class="compra">
+                <h3>Compra #002</h3>
+                <p>Producto: Ejemplo 2</p>
+                <p>Precio: $15.000</p>
+                <p>Estado: En preparación</p>
+            </div>
+        </section>
+
+         <!-- AYUDA -->
+        <section id="ayuda" class="seccion" style="display: none;">
+            <h1>Ayuda</h1>
+            <p>¿Necesitas ayuda?</p>
+            <p>Puedes comunicarte con nuestro servicio de atención al cliente.</p>
+        </section>
+
+    </main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
+
+// CSS
+
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background-color: #e3e3e3;
+}
+
+/* LOGIN */
+
+.contenedor {
+width: 300px;
+margin: 100px auto;
+padding: 30px;
+background-color: white;
+border-radius: 10px;
+box-shadow: 0 0 10px gray;
+}
+
+h1 {
+text-align: center;
+}
+
+label {
+display: block;
+margin-top: 15px;
+}
+
+input {
+width: 100%;
+padding: 10px;
+margin-top: 5px;
+box-sizing: border-box;
+}
+
+button {
+padding: 10px 15px;
+margin: 5px;
+border: none;
+border-radius: 5px;
+background-color: #007bff;
+color: white;
+cursor: pointer;
+}
+
+button:hover {
+background-color: #0056b3;
+}
+
+form button {
+width: 100%;
+margin-top: 20px;
+}
+
+p {
+text-align: center;
+}
+
+a {
+color: blue;
+}
+
+/* MENU PRINCIPAL */
+
+nav {
+background-color: #6a0dad;
+padding: 15px;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+nav h2 {
+color: white;
+margin-right: 20px;
+}
+
+nav button {
+background-color: #8e44ad;
+}
+
+nav button:hover {
+background-color: #5b167d;
+}
+
+/* SECCIONES */
+
+main {
+padding: 30px;
+}
+
+.seccion {
+background-color: white;
+padding: 30px;
+border-radius: 10px;
+box-shadow: 0 0 8px gray;
+}
+
+/* CATEGORIAS */
+
+.categorias {
+display: flex;
+gap: 20px;
+flex-wrap: wrap;
+}
+
+.categorias div {
+padding: 30px;
+background-color: #eeeeee;
+border-radius: 10px;
+}
+
+/* COMPRAS */
+
+.compra {
+background-color: #eeeeee;
+padding: 15px;
+margin: 15px 0;
+border-radius: 8px;
+}
+
+.compra p {
+text-align: left;
+}
+
+// JAVA
+
+function mostrarRegistro() {
+document.getElementById("formLogin").style.display = "none";
+document.getElementById("formRegistro").style.display = "block";
+document.getElementById("titulo").innerHTML = "Registro";
+}
+
+function mostrarLogin() {
+document.getElementById("formRegistro").style.display = "none";
+document.getElementById("formLogin").style.display = "block";
+document.getElementById("titulo").innerHTML = "Inicio de Sesión";
+}
+
+// Cuando el usuario hace login
+document.getElementById("formLogin").addEventListener("submit", function(event) {
+
+event.preventDefault();
+
+document.getElementById("loginRegistro").style.display = "none";
+document.getElementById("paginaPrincipal").style.display = "block";
+
+});
+
+// Cuando el usuario se registra
+document.getElementById("formRegistro").addEventListener("submit", function(event) {
+
+
+event.preventDefault();
+
+document.getElementById("loginRegistro").style.display = "none";
+document.getElementById("paginaPrincipal").style.display = "block";
+
+});
+
+// Cambiar entre secciones
+function mostrarSeccion(seccion) {
+
+
+let secciones = document.querySelectorAll(".seccion");
+
+secciones.forEach(function(elemento) {
+    elemento.style.display = "none";
+});
+
+document.getElementById(seccion).style.display = "block";
+
+}
+
+// Cerrar sesión
+function cerrarSesion() {
+
+document.getElementById("paginaPrincipal").style.display = "none";
+document.getElementById("loginRegistro").style.display = "block";
+
+mostrarLogin();
+
+}
