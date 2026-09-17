@@ -1,30 +1,29 @@
-// HTML
-
-!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda textil</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Tienda de Telas</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-<!-- LOGIN Y REGISTRO -->
 <div class="contenedor" id="loginRegistro">
 
     <h1 id="titulo">Inicio de Sesión</h1>
 
-    <!-- LOGIN -->
     <form id="formLogin">
 
         <label>Usuario</label>
-        <input type="text" placeholder="Ingrese su usuario" required>
+        <input type="text" id="loginUsuario" placeholder="Ingrese su usuario" required>
 
         <label>Contraseña</label>
-        <input type="password" placeholder="Ingrese su contraseña" required>
+        <input type="password" id="loginContraseña" placeholder="Ingrese su contraseña" required>
 
         <button type="submit">Login</button>
 
@@ -35,14 +34,14 @@
 
     </form>
 
-    <!-- REGISTRO -->
+
     <form id="formRegistro" style="display: none;">
 
         <label>Usuario</label>
-        <input type="text" placeholder="Ingrese un usuario" required>
+        <input type="text" id="registroUsuario" placeholder="Ingrese un usuario" required>
 
         <label>Contraseña</label>
-        <input type="password" placeholder="Ingrese una contraseña" required>
+        <input type="password" id="registroContraseña" placeholder="Ingrese una contraseña" required>
 
         <button type="submit">Registrarse</button>
 
@@ -55,97 +54,397 @@
 
 </div>
 
-
-<!-- PAGINA PRINCIPAL -->
 <div id="paginaPrincipal" style="display: none;">
 
     <nav>
+
         <h2>Mi Tienda</h2>
 
-        <button onclick="mostrarSeccion('inicio')">Inicio</button>
-        <button onclick="mostrarSeccion('categorias')">Categorías</button>
-        <button onclick="mostrarSeccion('compras')">Mis compras</button>
-        <button onclick="mostrarSeccion('ayuda')">Ayuda</button>
-        <button onclick="cerrarSesion()">Cerrar sesión</button>
+        <button onclick="mostrarSeccion('inicio')">
+            Inicio
+        </button>
+
+        <button onclick="mostrarSeccion('categorias')">
+            Categorías
+        </button>
+
+        <button onclick="mostrarSeccion('carrito')">
+            🛒 Carrito
+        </button>
+
+        <button onclick="mostrarSeccion('ayuda')">
+            Ayuda
+        </button>
+
+        <div class="zonaCuenta">
+
+            <button class="botonCuenta" onclick="abrirCuenta()">
+
+                <img id="iconoCuenta" src="" alt="Cuenta">
+
+                <span id="nombreCuenta">Usuario</span>
+
+                ▼
+
+            </button>
+
+            <div id="menuCuenta" class="menuCuenta">
+
+                <div class="cabeceraCuenta">
+
+                    <img id="iconoMenu" src="" alt="Usuario">
+
+                    <div>
+                        <strong id="nombreMenu">Usuario</strong>
+                        <small>Mi cuenta</small>
+                    </div>
+
+                </div>
+
+
+                <button onclick="editarPerfil()">
+                    ✏️ Editar perfil
+                </button>
+
+                <button onclick="cambiarIcono()">
+                    🖼️ Cambiar icono
+                </button>
+
+                <button onclick="agregarCuenta()">
+                    ➕ Agregar cuenta
+                </button>
+
+                <button onclick="cambiarCuenta()">
+                    🔄 Cambiar cuenta
+                </button>
+
+                <button onclick="cerrarSesion()">
+                    🚪 Cerrar sesión
+                </button>
+
+            </div>
+
+        </div>
+
     </nav>
 
+    <div class="buscador">
+
+        <input
+            type="text"
+            id="busqueda"
+            placeholder="🔎 Buscar tipos de telas..."
+            oninput="buscarTelas()"
+        >
+
+    </div>
 
     <main>
-
-        <!-- INICIO -->
         <section id="inicio" class="seccion">
+
             <h1>Inicio</h1>
-            <p>Bienvenido a nuestra tienda.</p>
-            <p>Desde aquí puedes consultar categorías, compras y facturación.</p>
+
+            <h2>Bienvenido a la tienda de telas</h2>
+
+            <p>
+                Encontrá la tela que necesitás para tus proyectos.
+            </p>
+
         </section>
-
-
-        <!-- CATEGORIAS -->
         <section id="categorias" class="seccion" style="display: none;">
-            <h1>Categorías</h1>
 
-            <div class="categorias">
-                <div>Algodon</div>
-                <div>Lino</div>
-                <div>Seda</div>
-                <div>Lana</div>
-                <div>Denim</div>
-                <div>Pana</div>
-                <div>Terciopelo</div>
-                <div>Saten</div>
-                <div>Chifon</div>
-                <div>Encaje</div>
-                <div>Jersey</div>
-                <div>Poliester</div>
-                <div>Nailon</div>
-                <div>Rayon</div>
-                <div>Muselina</div>
-                <div>Popelina</div>
-                <div>Tafetan</div>
-                <div>Tweed</div>
-                <div>Lycra</div>
-                <div>Fieltro</div>
-                <div>Polar</div>
-                <div>Organza</div>
-                <div>Pique</div>
-                <div>Brin</div>
-                <div>Crepe</div>
-            </div>
+    <h1>Categorías de telas</h1>
+
+    <div class="categorias">
+
+        <div class="producto">
+    <h3>Algodón</h3>
+    <button onclick="verTela('Algodón')">Ver</button>
+</div>
+
+        <div class="producto">
+            <h3>Lino</h3>
+            <p>Fresco y natural.</p>
+            <button onclick="agregarCarrito('Lino', 6000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Seda</h3>
+            <p>Suave y elegante.</p>
+            <button onclick="agregarCarrito('Seda', 8000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Lana</h3>
+            <p>Cálida y abrigada.</p>
+            <button onclick="agregarCarrito('Lana', 7000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Denim</h3>
+            <p>Resistente y duradero.</p>
+            <button onclick="agregarCarrito('Denim', 7500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Pana</h3>
+            <p>Textura acanalada.</p>
+            <button onclick="agregarCarrito('Pana', 6500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Terciopelo</h3>
+            <p>Suave y lujoso.</p>
+            <button onclick="agregarCarrito('Terciopelo', 9000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Satén</h3>
+            <p>Brillante y suave.</p>
+            <button onclick="agregarCarrito('Satén', 8500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Chifón</h3>
+            <p>Ligero y transparente.</p>
+            <button onclick="agregarCarrito('Chifón', 6000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Encaje</h3>
+            <p>Decorativo y delicado.</p>
+            <button onclick="agregarCarrito('Encaje', 7000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Jersey</h3>
+            <p>Flexible y cómodo.</p>
+            <button onclick="agregarCarrito('Jersey', 5500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Poliéster</h3>
+            <p>Resistente y versátil.</p>
+            <button onclick="agregarCarrito('Poliéster', 4500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Nailon</h3>
+            <p>Ligero y resistente.</p>
+            <button onclick="agregarCarrito('Nailon', 5000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Rayón</h3>
+            <p>Suave y fluido.</p>
+            <button onclick="agregarCarrito('Rayón', 5500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Muselina</h3>
+            <p>Ligera y suave.</p>
+            <button onclick="agregarCarrito('Muselina', 5000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Popelina</h3>
+            <p>Fina y resistente.</p>
+            <button onclick="agregarCarrito('Popelina', 6000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Tafetán</h3>
+            <p>Firme y brillante.</p>
+            <button onclick="agregarCarrito('Tafetán', 7500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Tweed</h3>
+            <p>Textura gruesa y cálida.</p>
+            <button onclick="agregarCarrito('Tweed', 8000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Lycra</h3>
+            <p>Elástica y flexible.</p>
+            <button onclick="agregarCarrito('Lycra', 5500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Fieltro</h3>
+            <p>Compacto y moldeable.</p>
+            <button onclick="agregarCarrito('Fieltro', 4500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Polar</h3>
+            <p>Suave y abrigado.</p>
+            <button onclick="agregarCarrito('Polar', 6500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Organza</h3>
+            <p>Transparente y delicada.</p>
+            <button onclick="agregarCarrito('Organza', 7500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Piqué</h3>
+            <p>Textura con relieve.</p>
+            <button onclick="agregarCarrito('Piqué', 6000)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Brin</h3>
+            <p>Firme y resistente.</p>
+            <button onclick="agregarCarrito('Brin', 5500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+        <div class="producto">
+            <h3>Crepe</h3>
+            <p>Textura ligeramente rugosa.</p>
+            <button onclick="agregarCarrito('Crepe', 6500)">
+                Agregar al carrito
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+        <section id="carrito" class="seccion" style="display: none;">
+
+            <h1>🛒 Mi Carrito</h1>
+
+            <div id="listaCarrito"></div>
+
+            <h3 id="totalCarrito">Total: $0</h3>
+
         </section>
 
-        <!-- COMPRAS -->
-        <section id="compras" class="seccion" style="display: none;">
-            <h1>Mis compras</h1>
-
-            <div class="compra">
-                <h3>Compra #001</h3>
-                <p>Producto: Ejemplo</p>
-                <p>Precio: $10.000</p>
-                <p>Estado: Entregado</p>
-            </div>
-
-            <div class="compra">
-                <h3>Compra #002</h3>
-                <p>Producto: Ejemplo 2</p>
-                <p>Precio: $15.000</p>
-                <p>Estado: En preparación</p>
-            </div>
-        </section>
-
-         <!-- AYUDA -->
         <section id="ayuda" class="seccion" style="display: none;">
+
             <h1>Ayuda</h1>
-            <p>¿Necesitas ayuda?</p>
-            <p>Puedes comunicarte con nuestro servicio de atención al cliente.</p>
+
+            <p>
+                ¿Necesitás ayuda? Contactá con nuestro servicio de atención.
+            </p>
+
         </section>
 
     </main>
 
 </div>
 
+<div id="ventanaPerfil" class="ventana">
+
+    <div class="contenidoVentana">
+
+        <h2>Editar perfil</h2>
+
+        <label>Nombre</label>
+
+        <input type="text" id="nuevoNombre">
+
+        <button onclick="guardarPerfil()">
+            Guardar cambios
+        </button>
+
+        <button onclick="cerrarVentana()">
+            Cancelar
+        </button>
+
+    </div>
+
+</div>
+
+<input
+    type="file"
+    id="inputIcono"
+    accept="image/*"
+    style="display: none;"
+    onchange="guardarIcono(event)"
+>
+
 <script src="script.js"></script>
 
 </body>
+
+<div id="ventanaTela" class="ventana-tela">
+    <div class="contenido-tela">
+
+        <span class="cerrar-tela" onclick="cerrarTela()">×</span>
+
+        <h2 id="nombreTela"></h2>
+
+        <p id="descripcionTela"></p>
+
+        <img id="imagenTela" src="" alt="Imagen de la tela">
+
+        <h3>Colores disponibles</h3>
+
+        <div id="coloresTela" class="colores-tela"></div>
+
+        <div class="compra-tela">
+            <p id="precioTela"></p>
+
+            <input type="number" id="cantidadTela"
+                   min="1" value="1">
+
+            <button id="botonAgregarTela">
+                Agregar al carrito
+            </button>
+        </div>
+
+    </div>
+</div>
+
 </html>
 
 // CSS
@@ -153,7 +452,7 @@
 body {
 margin: 0;
 font-family: Arial, sans-serif;
-background-color: #e3e3e3;
+background-color: #e6d5f0;
 }
 
 /* LOGIN */
@@ -181,6 +480,8 @@ width: 100%;
 padding: 10px;
 margin-top: 5px;
 box-sizing: border-box;
+border: 1px solid #bbb;
+border-radius: 5px;
 }
 
 button {
@@ -188,13 +489,13 @@ padding: 10px 15px;
 margin: 5px;
 border: none;
 border-radius: 5px;
-background-color: #007bff;
+background-color: #8e44ad;
 color: white;
 cursor: pointer;
 }
 
 button:hover {
-background-color: #0056b3;
+background-color: #5b167d;
 }
 
 form button {
@@ -207,10 +508,10 @@ text-align: center;
 }
 
 a {
-color: blue;
+color: #6a0dad;
 }
 
-/* MENU PRINCIPAL */
+/* MENU */
 
 nav {
 background-color: #6a0dad;
@@ -218,6 +519,7 @@ padding: 15px;
 display: flex;
 align-items: center;
 gap: 5px;
+flex-wrap: wrap;
 }
 
 nav h2 {
@@ -229,11 +531,136 @@ nav button {
 background-color: #8e44ad;
 }
 
-nav button:hover {
-background-color: #5b167d;
+/* CUENTA */
+
+.zonaCuenta {
+position: relative;
+margin-left: auto;
 }
 
-/* SECCIONES */
+.botonCuenta {
+display: flex;
+align-items: center;
+gap: 8px;
+background-color: #8e44ad;
+}
+
+.botonCuenta img {
+width: 35px;
+height: 35px;
+border-radius: 50%;
+object-fit: cover;
+background-color: white;
+}
+
+/* MENU DESPLEGABLE */
+
+.menuCuenta {
+display: none;
+
+position: absolute;
+
+right: 0;
+top: 55px;
+
+width: 240px;
+
+background-color: white;
+
+border-radius: 10px;
+
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+padding: 10px;
+
+z-index: 1000;
+
+}
+
+.menuCuenta.mostrar {
+display: block;
+}
+
+.menuCuenta button {
+display: block;
+
+width: 100%;
+
+margin: 5px 0;
+
+text-align: left;
+
+background-color: white;
+
+color: #333;
+
+}
+
+.menuCuenta button:hover {
+background-color: #eee;
+}
+
+/* CABECERA DE CUENTA */
+
+.cabeceraCuenta {
+display: flex;
+
+align-items: center;
+
+gap: 10px;
+
+padding: 10px;
+
+border-bottom: 1px solid #ddd;
+
+margin-bottom: 5px;
+
+}
+
+.cabeceraCuenta img {
+width: 45px;
+
+height: 45px;
+
+border-radius: 50%;
+
+object-fit: cover;
+
+background-color: #ddd;
+
+}
+
+.cabeceraCuenta small {
+display: block;
+
+color: gray;
+
+margin-top: 3px;
+
+}
+
+/* BUSCADOR */
+
+.buscador {
+padding: 20px;
+
+
+text-align: center;
+
+
+}
+
+.buscador input {
+width: 80%;
+
+
+max-width: 500px;
+
+border: 2px solid #8e44ad;
+
+}
+
+/* CONTENIDO */
 
 main {
 padding: 30px;
@@ -241,93 +668,697 @@ padding: 30px;
 
 .seccion {
 background-color: white;
+
+
 padding: 30px;
+
 border-radius: 10px;
+
 box-shadow: 0 0 8px gray;
+
+
 }
 
 /* CATEGORIAS */
 
 .categorias {
 display: flex;
+
+
 gap: 20px;
+
 flex-wrap: wrap;
+
+
 }
 
-.categorias div {
-padding: 30px;
+.producto {
+padding: 20px;
+
+
 background-color: #eeeeee;
+
 border-radius: 10px;
+
+width: 200px;
+
+
 }
 
-/* COMPRAS */
-
-.compra {
-background-color: #eeeeee;
-padding: 15px;
-margin: 15px 0;
-border-radius: 8px;
+.producto h3 {
+color: #6a0dad;
 }
 
-.compra p {
+.producto p {
 text-align: left;
+}
+
+/* CARRITO */
+
+#listaCarrito div {
+background-color: #eeeeee;
+
+padding: 15px;
+
+margin: 10px 0;
+
+border-radius: 8px;
+
+}
+
+/* VENTANA EDITAR PERFIL */
+
+.ventana {
+display: none;
+
+
+position: fixed;
+
+top: 0;
+left: 0;
+
+width: 100%;
+height: 100%;
+
+background-color: rgba(0, 0, 0, 0.5);
+
+justify-content: center;
+align-items: center;
+
+z-index: 2000;
+
+
+}
+
+.contenidoVentana {
+background-color: white;
+
+
+padding: 30px;
+
+width: 300px;
+
+border-radius: 10px;
+
+box-shadow: 0 0 15px black;
+
+
+}
+
+.contenidoVentana h2 {
+text-align: center;
+}
+
+.ventana-tela {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.contenido-tela {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    position: relative;
+}
+
+.cerrar-tela {
+    position: absolute;
+    right: 18px;
+    top: 8px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+#imagenTela {
+    width: 220px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.colores-tela {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.color-tela {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #555;
+    cursor: pointer;
+}
+
+.compra-tela {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#cantidadTela {
+    width: 60px;
+    padding: 8px;
+}
+
+#botonAgregarTela {
+    background: #8e44ad;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#botonAgregarTela:hover {
+    background: #6a0dad;
 }
 
 // JAVA
 
 function mostrarRegistro() {
+
 document.getElementById("formLogin").style.display = "none";
+
 document.getElementById("formRegistro").style.display = "block";
+
 document.getElementById("titulo").innerHTML = "Registro";
+
 }
 
 function mostrarLogin() {
+
 document.getElementById("formRegistro").style.display = "none";
+
 document.getElementById("formLogin").style.display = "block";
+
 document.getElementById("titulo").innerHTML = "Inicio de Sesión";
+
 }
 
-// Cuando el usuario hace login
+document.getElementById("formRegistro").addEventListener("submit", function(event) {
+
+event.preventDefault();
+
+let usuario = document.getElementById("registroUsuario").value;
+
+let contraseña = document.getElementById("registroContraseña").value;
+
+
+if (localStorage.getItem("cuenta_" + usuario)) {
+
+    alert("Ese usuario ya existe.");
+
+    return;
+}
+
+let cuenta = {
+
+    usuario: usuario,
+
+    nombre: usuario,
+
+    contraseña: contraseña,
+
+    icono: ""
+
+};
+
+localStorage.setItem(
+    "cuenta_" + usuario,
+    JSON.stringify(cuenta)
+);
+
+alert("Cuenta creada correctamente.");
+
+document.getElementById("registroUsuario").value = "";
+
+document.getElementById("registroContraseña").value = "";
+
+mostrarLogin();
+
+});
+
 document.getElementById("formLogin").addEventListener("submit", function(event) {
 
 event.preventDefault();
 
+let usuario = document.getElementById("loginUsuario").value;
+
+let contraseña = document.getElementById("loginContraseña").value;
+
+let datos = localStorage.getItem("cuenta_" + usuario);
+
+if (!datos) {
+
+    alert("El usuario no existe.");
+
+    return;
+}
+
+let cuenta = JSON.parse(datos);
+
+if (cuenta.contraseña !== contraseña) {
+
+    alert("Contraseña incorrecta.");
+
+    return;
+}
+
+localStorage.setItem("usuarioActual", usuario);
+
+entrarAlSistema(cuenta);
+
+});
+
+function entrarAlSistema(cuenta) {
+
 document.getElementById("loginRegistro").style.display = "none";
+
 document.getElementById("paginaPrincipal").style.display = "block";
 
-});
 
-// Cuando el usuario se registra
-document.getElementById("formRegistro").addEventListener("submit", function(event) {
+actualizarCuenta(cuenta);
 
-
-event.preventDefault();
-
-document.getElementById("loginRegistro").style.display = "none";
-document.getElementById("paginaPrincipal").style.display = "block";
-
-});
-
-// Cambiar entre secciones
-function mostrarSeccion(seccion) {
-
-
-let secciones = document.querySelectorAll(".seccion");
-
-secciones.forEach(function(elemento) {
-    elemento.style.display = "none";
-});
-
-document.getElementById(seccion).style.display = "block";
+mostrarSeccion("inicio");
 
 }
 
-// Cerrar sesión
-function cerrarSesion() {
+function actualizarCuenta(cuenta) {
+
+document.getElementById("nombreCuenta").innerText = cuenta.nombre;
+
+document.getElementById("nombreMenu").innerText = cuenta.nombre;
+
+
+let icono = document.getElementById("iconoCuenta");
+
+let iconoMenu = document.getElementById("iconoMenu");
+
+
+if (cuenta.icono) {
+
+    icono.src = cuenta.icono;
+
+    iconoMenu.src = cuenta.icono;
+
+} else {
+
+    icono.src =
+        "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+    iconoMenu.src =
+        "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+}
+
+}
+
+function abrirCuenta() {
+
+let menu = document.getElementById("menuCuenta");
+
+menu.classList.toggle("mostrar");
+
+}
+
+function editarPerfil() {
+
+let usuario = localStorage.getItem("usuarioActual");
+
+let datos = localStorage.getItem("cuenta_" + usuario);
+
+let cuenta = JSON.parse(datos);
+
+
+document.getElementById("nuevoNombre").value = cuenta.nombre;
+
+
+document.getElementById("ventanaPerfil").style.display = "flex";
+
+
+document.getElementById("menuCuenta").classList.remove("mostrar");
+
+}
+
+function guardarPerfil() {
+
+let usuario = localStorage.getItem("usuarioActual");
+
+let datos = localStorage.getItem("cuenta_" + usuario);
+
+let cuenta = JSON.parse(datos);
+
+
+let nuevoNombre =
+    document.getElementById("nuevoNombre").value;
+
+
+if (nuevoNombre.trim() === "") {
+
+    alert("El nombre no puede estar vacío.");
+
+    return;
+}
+
+
+cuenta.nombre = nuevoNombre;
+
+
+localStorage.setItem(
+    "cuenta_" + usuario,
+    JSON.stringify(cuenta)
+);
+
+
+actualizarCuenta(cuenta);
+
+
+cerrarVentana();
+
+}
+
+function cerrarVentana() {
+
+document.getElementById("ventanaPerfil").style.display = "none";
+
+}
+
+function cambiarIcono() {
+
+document.getElementById("inputIcono").click();
+
+document.getElementById("menuCuenta").classList.remove("mostrar");
+
+}
+
+function guardarIcono(event) {
+
+let archivo = event.target.files[0];
+
+
+if (!archivo) {
+
+    return;
+}
+
+
+let lector = new FileReader();
+
+
+lector.onload = function(e) {
+
+    let usuario = localStorage.getItem("usuarioActual");
+
+    let datos = localStorage.getItem("cuenta_" + usuario);
+
+    let cuenta = JSON.parse(datos);
+
+    cuenta.icono = e.target.result;
+
+    localStorage.setItem(
+        "cuenta_" + usuario,
+        JSON.stringify(cuenta)
+    );
+
+
+    actualizarCuenta(cuenta);
+
+};
+
+lector.readAsDataURL(archivo);
+
+}
+
+function agregarCuenta() {
+
+localStorage.removeItem("usuarioActual");
+
 
 document.getElementById("paginaPrincipal").style.display = "none";
+
 document.getElementById("loginRegistro").style.display = "block";
+
+
+document.getElementById("loginUsuario").value = "";
+
+document.getElementById("loginContraseña").value = "";
+
 
 mostrarLogin();
 
+
+document.getElementById("menuCuenta").classList.remove("mostrar");
+
+}
+
+function cambiarCuenta() {
+
+agregarCuenta();
+
+}
+
+function cerrarSesion() {
+
+localStorage.removeItem("usuarioActual");
+
+
+document.getElementById("paginaPrincipal").style.display = "none";
+
+document.getElementById("loginRegistro").style.display = "block";
+
+
+document.getElementById("loginUsuario").value = "";
+
+document.getElementById("loginContraseña").value = "";
+
+
+mostrarLogin();
+
+}
+
+function mostrarSeccion(seccion) {
+
+let secciones =
+    document.querySelectorAll(".seccion");
+
+
+secciones.forEach(function(elemento) {
+
+    elemento.style.display = "none";
+
+});
+
+
+document.getElementById(seccion).style.display = "block";
+
+
+if (seccion === "carrito") {
+
+    mostrarCarrito();
+
+}
+
+}
+
+function buscarTelas() {
+
+let texto =
+    document.getElementById("busqueda").value.toLowerCase();
+
+
+let productos =
+    document.querySelectorAll(".producto");
+
+
+productos.forEach(function(producto) {
+
+    let nombre =
+        producto.querySelector("h3").innerText.toLowerCase();
+
+
+    if (nombre.includes(texto)) {
+
+        producto.style.display = "block";
+
+    } else {
+
+        producto.style.display = "none";
+
+    }
+
+});
+
+}
+
+let carrito = [];
+
+function agregarCarrito(nombre, precio) {
+
+carrito.push({
+
+    nombre: nombre,
+
+    precio: precio
+
+});
+
+
+alert(nombre + " agregado al carrito.");
+
+}
+
+function mostrarCarrito() {
+
+let lista =
+    document.getElementById("listaCarrito");
+
+
+let total = 0;
+
+
+lista.innerHTML = "";
+
+
+if (carrito.length === 0) {
+
+    lista.innerHTML =
+        "<p>El carrito está vacío.</p>";
+
+}
+
+
+carrito.forEach(function(producto, index) {
+
+    total += producto.precio;
+
+
+    lista.innerHTML += `
+
+        <div>
+
+            <h3>${producto.nombre}</h3>
+
+            <p>Precio: $${producto.precio}</p>
+
+            <button onclick="eliminarCarrito(${index})">
+
+                Eliminar
+
+            </button>
+
+        </div>
+
+    `;
+
+});
+
+
+document.getElementById("totalCarrito").innerText =
+    "Total: $" + total;
+
+}
+
+function eliminarCarrito(index) {
+carrito.splice(index, 1);
+
+mostrarCarrito();
+
+}
+
+const datosTelas = {
+    "Algodón": {
+        descripcion: "Tela suave, cómoda y transpirable. Ideal para ropa y prendas de uso diario.",
+        imagen: "imagenes/algodon.jpg",
+        precio: 5000,
+        colores: ["white", "black", "red", "blue", "green"]
+    },
+
+    "Lino": {
+        descripcion: "Tela fresca y ligera, ideal para prendas de verano.",
+        imagen: "imagenes/lino.jpg",
+        precio: 6000,
+        colores: ["white", "beige", "gray", "blue"]
+    },
+
+    "Seda": {
+        descripcion: "Tela suave y brillante, utilizada en prendas elegantes.",
+        imagen: "imagenes/seda.jpg",
+        precio: 8000,
+        colores: ["white", "pink", "red", "black", "purple"]
+    }
+};
+
+let telaSeleccionada = "";
+
+function verTela(nombre) {
+    const tela = datosTelas[nombre];
+
+    if (!tela) {
+        alert("Todavía no hay información de esta tela.");
+        return;
+    }
+
+    telaSeleccionada = nombre;
+
+    document.getElementById("nombreTela").textContent = nombre;
+    document.getElementById("descripcionTela").textContent =
+        tela.descripcion;
+
+    document.getElementById("imagenTela").src = tela.imagen;
+
+    document.getElementById("precioTela").textContent =
+        "Precio: $" + tela.precio.toLocaleString("es-AR") + " por metro";
+
+    const contenedorColores = document.getElementById("coloresTela");
+    contenedorColores.innerHTML = "";
+
+    tela.colores.forEach(color => {
+        const botonColor = document.createElement("button");
+
+        botonColor.className = "color-tela";
+        botonColor.style.backgroundColor = color;
+        botonColor.title = color;
+
+        contenedorColores.appendChild(botonColor);
+    });
+
+    document.getElementById("cantidadTela").value = 1;
+
+    document.getElementById("botonAgregarTela").onclick = function () {
+        const cantidad = Number(
+            document.getElementById("cantidadTela").value
+        );
+
+        if (cantidad < 1) {
+            alert("Ingresá una cantidad válida.");
+            return;
+        }
+
+        for (let i = 0; i < cantidad; i++) {
+            agregarCarrito(nombre, tela.precio);
+        }
+
+        cerrarTela();
+    };
+
+    document.getElementById("ventanaTela").style.display = "flex";
+}
+
+function cerrarTela() {
+    document.getElementById("ventanaTela").style.display = "none";
 }
